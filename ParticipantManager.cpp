@@ -41,10 +41,11 @@ void ParticipantManager::getParticipants() {
     int rows = PQntuples(res);
 
     std::cout << "Участники:" << std::endl;
+    std::cout<< "Имя      Фамилия     Год рождения"<< std::endl;
     for (int i = 0; i < rows; i++) {
-        std::cout << "Имя : " << PQgetvalue(res, i, 1) << ", "
-                  << "Фамилия: " << PQgetvalue(res, i, 2) << ", "
-                  << "Год рождения: " << PQgetvalue(res, i, 3) << std::endl;
+        std::cout <<  PQgetvalue(res, i, 1) << ", "
+                  << PQgetvalue(res, i, 2) << ", "
+                  << PQgetvalue(res, i, 3) << std::endl;
     }
 
     PQclear(res);
