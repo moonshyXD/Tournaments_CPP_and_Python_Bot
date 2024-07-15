@@ -16,4 +16,4 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// Массив disciplines ResultManager.cpp -> checkFirst();
+// Vector disciplines for change discipline priority ResultManager.cpp -> checkFirst();
