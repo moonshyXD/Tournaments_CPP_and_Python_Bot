@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
 
-include_directories("D:/pgsql/include")
-link_directories("D:/pgsql/lib")
+include_directories("path to pgsql/include")
+link_directories("path to pgsql/lib")
 
 find_package(PostgreSQL REQUIRED)
 
