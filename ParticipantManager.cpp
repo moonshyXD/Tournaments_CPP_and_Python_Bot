@@ -43,8 +43,8 @@ void ParticipantManager::getParticipants() {
     std::cout << "Участники:" << std::endl;
     std::cout<< "Имя      Фамилия     Год рождения"<< std::endl;
     for (int i = 0; i < rows; i++) {
-        std::cout <<  PQgetvalue(res, i, 1) << ", "
-                  << PQgetvalue(res, i, 2) << ", "
+        std::cout <<  PQgetvalue(res, i, 1) << " "
+                  << PQgetvalue(res, i, 2) << " "
                   << PQgetvalue(res, i, 3) << std::endl;
     }
 
