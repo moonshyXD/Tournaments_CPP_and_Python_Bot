@@ -21,7 +21,7 @@ Database::Database() {
     SQLCommands::tableGroups();
     SQLCommands::tableParticipants();
     SQLCommands::tableParticipantGroups();
-    SQLCommands ::tableResults();
+    SQLCommands::tableResults();
     SQLCommands::tableUsers();
 }
 
