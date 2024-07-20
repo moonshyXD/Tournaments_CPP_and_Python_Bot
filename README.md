@@ -21,5 +21,3 @@ password: password1, password2.
 
 Parents can add participants.
 Parent hasn't credentials.
-
-XD =)
