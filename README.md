@@ -14,7 +14,7 @@ Judge credentials:
 login: judge1, judge2.
 password: password1, password2.
 
-Team leader can only check participant's groups.
+Team leader can check participant's groups only.
 Team leader credentials: 
 login: teamleader1, teamleader2.
 password: password1, password2.
