@@ -1,17 +1,26 @@
+import logging
 import telebot
 import subprocess
 from telebot import types
-from GeneralMessages import *
-from Requests import *
-from Paths import *
-from Alphabets import *
-from AuthorizationMessages import *
-from DebugMessages import *
-from Operations import *
-from Buttons import *
-from TelegramAPI import *
-from Credentials import *
-from Commands import *
+from Messages_files.GeneralMessages import *
+from Messages_files.Requests import *
+from Messages_files.Paths import *
+from Messages_files.Alphabets import *
+from Messages_files.AuthorizationMessages import *
+from Messages_files.DebugMessages import *
+from Messages_files.Operations import *
+from Messages_files.Buttons import *
+from Messages_files.TelegramAPI import *
+from Messages_files.Credentials import *
+from Messages_files.Commands import *
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 bot = telebot.TeleBot(TELEGRAM_API)
 
@@ -19,19 +28,21 @@ admin_registration = False
 judge_registration = False
 team_leader_registration = False
 
+logger = logging.getLogger(__name__)
+
 
 @bot.message_handler(commands=[START])
 def handle_start(message: types.Message):
+    logger.info("Получена команда /start")
     global admin_registration, judge_registration, team_leader_registration
     admin_registration = False
     judge_registration = False
     team_leader_registration = False
-    bot.send_message(message.chat.id,
-                     WELCOME_MESSAGE,
-                     reply_markup=role_markup())
+    bot.send_message(message.chat.id, WELCOME_MESSAGE, reply_markup=role_markup())
 
 
 def translate_rus_to_eng(text: str) -> str:
+    logger.debug(f"Перевод текста: {text}")
     alphabet_eng = ENGLISH_ALPHABET
     alphabet_rus = RUSSIAN_ALPHABET
 
@@ -44,10 +55,13 @@ def translate_rus_to_eng(text: str) -> str:
         else:
             translated_text.append(char)
 
-    return ''.join(translated_text)
+    result = ''.join(translated_text)
+    logger.debug(f"Переведенный текст: {result}")
+    return result
 
 
 def role_markup() -> types.ReplyKeyboardMarkup:
+    logger.debug("Создание разметки ролей")
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn_admin = types.KeyboardButton(BTN_ADMIN)
     btn_judge = types.KeyboardButton(BTN_JUDGE)
@@ -59,6 +73,7 @@ def role_markup() -> types.ReplyKeyboardMarkup:
 
 @bot.message_handler(func=lambda message: message.text in [BTN_ADMIN, BTN_JUDGE, BTN_TEAM_LEADER, BTN_PARENT])
 def handle_role(message: types.Message):
+    logger.info(f"Выбрана роль: {message.text}")
     role = message.text
     bot.send_message(message.chat.id, PICKED_ROLE)
 
@@ -76,6 +91,7 @@ def handle_role(message: types.Message):
 
 
 def back_to_role_markup() -> types.ReplyKeyboardMarkup:
+    logger.debug("Создание разметки возврата к ролям")
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn_back_to_role = types.KeyboardButton(BTN_BACK_TO_ROLE)
     markup.add(btn_back_to_role)
@@ -83,11 +99,13 @@ def back_to_role_markup() -> types.ReplyKeyboardMarkup:
 
 
 def ask_login(chat_id: int):
+    logger.info(f"Запрос логина для chat_id: {chat_id}")
     bot.send_message(chat_id, LOGIN_REQUEST, reply_markup=back_to_role_markup())
     bot.register_next_step_handler_by_chat_id(chat_id, ask_password)
 
 
 def ask_password(message: types.Message):
+    logger.info(f"Запрос пароля для пользователя: {message.text}")
     login = message.text
     chat_id = message.chat.id
     back_to_role_markup()
@@ -100,11 +118,13 @@ def ask_password(message: types.Message):
         handle_start(message)
         return
 
+    logger.warning(f"Неправильная попытка входа: {login}")
     bot.send_message(chat_id, INVALID_LOGIN, reply_markup=back_to_role_markup())
     ask_login(chat_id)
 
 
 def check_credentials(message: types.Message, login: str):
+    logger.info(f"Проверка учетных данных для пользователя: {login}")
     chat_id = message.chat.id
     password = message.text
 
@@ -127,11 +147,13 @@ def check_credentials(message: types.Message, login: str):
         handle_start(message)
         return
 
+    logger.warning(f"Неправильная попытка ввода пароля для пользователя: {login}")
     bot.send_message(chat_id, INVALID_PASSWORD, reply_markup=back_to_role_markup())
     ask_password(message)
 
 
 def show_options(chat_id: int):
+    logger.info(f"Отображение опций для chat_id: {chat_id}")
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn_get_list = types.KeyboardButton(BTN_GET_LIST)
     btn_send_list = types.KeyboardButton(BTN_SEND_LIST)
@@ -152,6 +174,7 @@ def show_options(chat_id: int):
 
 
 def distribute_options(buttons: list, markup: types.ReplyKeyboardMarkup):
+    logger.debug("Распределение опций в зависимости от роли пользователя")
     (btn_get_list, btn_send_list, btn_post_participant, btn_delete_participant, btn_get_group, btn_post_result,
      btn_delete_result, btn_sort_into_group, btn_clear_database, btn_save_csv, btn_start) = buttons
     if admin_registration:
@@ -172,6 +195,7 @@ def distribute_options(buttons: list, markup: types.ReplyKeyboardMarkup):
     BTN_DELETE_RESULT, BTN_CLEAR_DATABASE, BTN_SAVE_CSV, BTN_BACK_TO_ROLE
 ])
 def handle_action(message: types.Message):
+    logger.info(f"Обработка действия: {message.text}")
     if admin_registration:
         if message.text == BTN_SEND_LIST:
             operation = POST_PARTICIPANT_OPERATION
@@ -212,7 +236,7 @@ def handle_action(message: types.Message):
             bot.send_message(message.chat.id, GROUP_NUMBER_REQUEST)
             bot.register_next_step_handler(message, get_group_number, operation)
 
-    if message.text == BTN_POST_RESULT:
+    if message.text == BTN_POST_PARTICIPANT:
         operation = POST_PARTICIPANT_OPERATION
         bot.send_message(message.chat.id, FIRST_NAME_REQUEST)
         bot.register_next_step_handler(message, get_first_name, operation)
@@ -222,6 +246,7 @@ def handle_action(message: types.Message):
 
 
 def get_path(message: types.Message, operation: str):
+    logger.info(f"Получение пути для операции: {operation}")
     path = message.text
     CPP_backend(message, NONE, NONE, NONE, NONE, NONE, NONE, path, operation)
 
@@ -241,6 +266,7 @@ def CPP_backend(message: types.Message, first_name: types.Message, last_name: ty
         last_name = translate_rus_to_eng(last_name)
         discipline = translate_rus_to_eng(discipline)
 
+        logger.debug(f"Выполнение backend с аргументами: {arguments}")
         process = subprocess.run(
             [executable_path, first_name, last_name, age, result, discipline, group_number, path, operation],
             stdout=subprocess.PIPE,
@@ -249,8 +275,8 @@ def CPP_backend(message: types.Message, first_name: types.Message, last_name: ty
         debugging_process(chat_id, process)
         bot_repeat(chat_id, message)
     except Exception as e:
-        error_message = EXCEPTION_MESSAGE
-        print(error_message)
+        logger.error(f"Произошла ошибка: {e}")
+        bot.send_message(chat_id, EXCEPTION_MESSAGE)
 
 
 def debugging_process(chat_id: int, process: subprocess.run):
@@ -259,11 +285,10 @@ def debugging_process(chat_id: int, process: subprocess.run):
                          STDOUT_MESSAGE, f"{process.stdout}\n",
                          STDERR_MESSAGE, f"{process.stderr}\n",
                          RETURN_CODE_MESSAGE, f"{process.returncode}")
-        print(error_message)
-        #            bot.send_message(chat_id, error_message)
+        logger.error(f"Ошибка при выполнении команды: {error_message}")
         bot.send_message(chat_id, COMMAND_EXECUTION_ERROR)
     else:
-        print(COMMAND_SUCCESS, '\n', STDOUT_MESSAGE, f"{process.stdout}")
+        logger.info(f"Команда успешно выполнена: {process.stdout}")
         bot.send_message(chat_id, process.stdout)
         bot.send_message(chat_id, COMMAND_SUCCESS)
 
@@ -277,8 +302,26 @@ def bot_repeat(chat_id: int, message: types.Message):
     handle_start(message)
 
 
+def check_first_name(first_name: str):
+    for i in first_name:
+        if i == ' ':
+            return False
+    return True
+
+
+def check_age(age: str):
+    for i in age:
+        if '0' >= i >= '9':
+            return False
+    return True
+
+
 def get_first_name(message: types.Message, operation: str):
     first_name = message.text
+    if not check_first_name(first_name):
+        bot.send_message(message.chat.id, ERROR_FIRST_NAME_REQUEST)
+        bot.register_next_step_handler(message, get_first_name, operation)
+        return
     bot.send_message(message.chat.id, LAST_NAME_REQUEST)
     bot.register_next_step_handler(message, get_last_name, first_name, operation)
 
@@ -291,6 +334,11 @@ def get_last_name(message: types.Message, first_name: types.Message, operation: 
 
 def get_age(message: types.Message, first_name: types.Message, last_name: types.Message, operation: str):
     age = message.text
+    if not check_first_name(age):
+        bot.send_message(message.chat.id, AGE_REQUEST)
+        bot.register_next_step_handler(message, get_age, first_name, last_name, operation)
+        return
+
     if operation == POST_PARTICIPANT_OPERATION or operation == DELETE_PARTICIPANT_OPERATION:
         CPP_backend(message, first_name, last_name, age, NONE, NONE, NONE, NONE, operation)
     else:
@@ -339,13 +387,16 @@ def handle_file_upload(message: types.Message, operation: str):
         with open(RECEIVED_FILE, 'wb') as new_file:
             new_file.write(downloaded_file)
 
+        logger.info(f"Файл загружен: {RECEIVED_FILE}")
         CPP_backend(message, NONE, NONE, NONE, NONE, NONE, NONE, RECEIVED_FILE, operation)
     else:
+        logger.warning("Загружен неверный тип файла")
         bot.send_message(message.chat.id, CSV_PATH_REQUEST)
 
 
 @bot.message_handler(func=lambda message: True)
 def handle_other(message):
+    logger.info(f"Получено необработанное сообщение: {message.text}")
     bot.send_message(message.chat.id, USE_BUTTONS)
 
 
