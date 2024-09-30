@@ -4,7 +4,8 @@ It also supports saving the database results to an Excel .csv file. Additionally
 
 C++ Requirements: 
 PostgreSQL libreary - https://github.com/postgres/postgres/tree/master 
-Spdlog - https://github.com/gabime/spdlog
+Spdlog library - https://github.com/gabime/spdlog
+If you can, please, download these libraries for this path D:/pgsql or D:/spdlog-1.x. If you can't do this, change path for these libraries in CMakeLists.txt in CPP_files
 
 This bot has 4 access rights: administrator, judge, team leader, parent.
 
