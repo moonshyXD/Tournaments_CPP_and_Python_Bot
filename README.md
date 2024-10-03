@@ -3,7 +3,7 @@ The program supports adding and removing participants and their results from the
 It also supports saving the database results to an Excel .csv file. Additionally, this database saving feature can be used if the message sent by the bot is too large for Telegram to handle.
 
 C++ Requirements: 
-PostgreSQL libreary - https://github.com/postgres/postgres/tree/master 
+PostgreSQL library - https://github.com/postgres/postgres/tree/master 
 Spdlog library - https://github.com/gabime/spdlog
 If you can, please, download these libraries for this path D:/pgsql or D:/spdlog-1.x. If you can't do this, change path for these libraries in CMakeLists.txt in CPP_files
 
