@@ -3,17 +3,17 @@ import telebot
 import subprocess
 import os
 from telebot import types
-from Messages_files.GeneralMessages import *
-from Messages_files.Requests import *
-from Messages_files.Paths import *
-from Messages_files.Alphabets import *
-from Messages_files.AuthorizationMessages import *
-from Messages_files.DebugMessages import *
-from Messages_files.Operations import *
-from Messages_files.Buttons import *
-from Messages_files.TelegramAPI import *
-from Messages_files.Credentials import *
-from Messages_files.Commands import *
+from Requirements.GeneralMessages import *
+from Requirements.Requests import *
+from Requirements.Paths import *
+from Requirements.Alphabets import *
+from Requirements.AuthorizationMessages import *
+from Requirements.DebugMessages import *
+from Requirements.Operations import *
+from Requirements.Buttons import *
+from Requirements.TelegramAPI import *
+from Requirements.Credentials import *
+from Requirements.Commands import *
 
 logging.basicConfig(
     level=logging.DEBUG,
